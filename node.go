@@ -14,7 +14,7 @@ type Item struct {
 
 type Node struct {
 	// associated transaction
-	tx         *tx
+	tx         *Tx
 	pageNum    pgnum
 	items      []*Item
 	childNodes []pgnum

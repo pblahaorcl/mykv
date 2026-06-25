@@ -11,7 +11,7 @@ type Collection struct {
 	counter uint64
 
 	// associated transaction
-	tx *tx
+	tx *Tx
 }
 
 // newCollection creates a new collection.

@@ -12,8 +12,6 @@ type Tx struct {
 	db *DB
 }
 
-type tx = Tx
-
 func newTx(db *DB, write bool) *Tx {
 	return &Tx{
 		map[pgnum]*Node{},
@@ -24,7 +22,7 @@ func newTx(db *DB, write bool) *Tx {
 	}
 }
 
-func (tx *tx) newNode(items []*Item, childNodes []pgnum) *Node {
+func (tx *Tx) newNode(items []*Item, childNodes []pgnum) *Node {
 	node := NewEmptyNode()
 	node.items = items
 	node.childNodes = childNodes
@@ -35,7 +33,7 @@ func (tx *tx) newNode(items []*Item, childNodes []pgnum) *Node {
 	return node
 }
 
-func (tx *tx) getNode(pageNum pgnum) (*Node, error) {
+func (tx *Tx) getNode(pageNum pgnum) (*Node, error) {
 	if node, ok := tx.dirtyNodes[pageNum]; ok {
 		return node, nil
 	}
@@ -48,17 +46,17 @@ func (tx *tx) getNode(pageNum pgnum) (*Node, error) {
 	return node, nil
 }
 
-func (tx *tx) writeNode(node *Node) *Node {
+func (tx *Tx) writeNode(node *Node) *Node {
 	tx.dirtyNodes[node.pageNum] = node
 	node.tx = tx
 	return node
 }
 
-func (tx *tx) deleteNode(node *Node) {
+func (tx *Tx) deleteNode(node *Node) {
 	tx.pagesToDelete = append(tx.pagesToDelete, node.pageNum)
 }
 
-func (tx *tx) Rollback() {
+func (tx *Tx) Rollback() {
 	if !tx.write {
 		tx.db.rwlock.RUnlock()
 		return
@@ -73,7 +71,7 @@ func (tx *tx) Rollback() {
 	tx.db.rwlock.Unlock()
 }
 
-func (tx *tx) Commit() error {
+func (tx *Tx) Commit() error {
 	if !tx.write {
 		tx.db.rwlock.RUnlock()
 		return nil
@@ -141,14 +139,14 @@ func (tx *tx) Commit() error {
 //	return tx.commitNode(node)
 //}
 
-func (tx *tx) getRootCollection() *Collection {
+func (tx *Tx) getRootCollection() *Collection {
 	rootCollection := newEmptyCollection()
 	rootCollection.root = tx.db.root
 	rootCollection.tx = tx
 	return rootCollection
 }
 
-func (tx *tx) GetCollection(name []byte) (*Collection, error) {
+func (tx *Tx) GetCollection(name []byte) (*Collection, error) {
 	rootCollection := tx.getRootCollection()
 	item, err := rootCollection.Find(name)
 	if err != nil {
@@ -165,7 +163,7 @@ func (tx *tx) GetCollection(name []byte) (*Collection, error) {
 	return collection, nil
 }
 
-func (tx *tx) CreateCollection(name []byte) (*Collection, error) {
+func (tx *Tx) CreateCollection(name []byte) (*Collection, error) {
 	if !tx.write {
 		return nil, errWriteInsideReadTx
 	}
@@ -181,7 +179,7 @@ func (tx *tx) CreateCollection(name []byte) (*Collection, error) {
 	return tx.createCollection(newCollection)
 }
 
-func (tx *tx) GetOrCreateCollection(name []byte) (*Collection, error) {
+func (tx *Tx) GetOrCreateCollection(name []byte) (*Collection, error) {
 	collection, err := tx.GetCollection(name)
 	if err != nil {
 		return nil, err
@@ -192,7 +190,7 @@ func (tx *tx) GetOrCreateCollection(name []byte) (*Collection, error) {
 	return tx.CreateCollection(name)
 }
 
-func (tx *tx) DeleteCollection(name []byte) error {
+func (tx *Tx) DeleteCollection(name []byte) error {
 	if !tx.write {
 		return errWriteInsideReadTx
 	}
@@ -203,7 +201,7 @@ func (tx *tx) DeleteCollection(name []byte) error {
 
 }
 
-func (tx *tx) createCollection(collection *Collection) (*Collection, error) {
+func (tx *Tx) createCollection(collection *Collection) (*Collection, error) {
 	collection.tx = tx
 	collectionBytes := collection.serialize()
 
