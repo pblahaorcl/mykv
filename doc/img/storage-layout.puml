@@ -1,0 +1,28 @@
+@startuml
+title Persistent storage layout
+
+skinparam rectangle {
+  RoundCorner 0
+}
+
+rectangle "data.db" as file {
+  rectangle "Page 0: meta\nmagicNumber\nroot page\nfreelist page" as meta
+  rectangle "Page N: freelist\nmaxPage\nreleased page count\nreleased page ids..." as freelist
+  rectangle "Page R: root collection B+ tree node\nkeys: collection names\nvalues: serialized Collection" as root
+  rectangle "Collection root pages\nB+ tree nodes containing user key/value items" as collectionRoots
+  rectangle "Free/reusable pages\ntracked by freelist.releasedPages" as freePages
+}
+
+meta --> root : root
+meta --> freelist : freelistPage
+root --> collectionRoots : collection.root
+freelist --> freePages : releasedPages
+collectionRoots --> collectionRoots : childNodes page refs
+
+note right of collectionRoots
+Every node is stored in one fixed-size page.
+dal.pageSize is set from os.Getpagesize().
+Node payloads use a slotted page layout.
+end note
+
+@enduml

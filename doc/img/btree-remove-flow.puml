@@ -1,0 +1,44 @@
+@startuml
+title Collection.Remove B+ tree flow
+
+start
+:Require write transaction;
+:Load collection root node;
+:findKey(key, exact=true);
+
+if (key found?) then (no)
+  stop
+endif
+
+if (containing node is leaf?) then (yes)
+  :Remove item from leaf;
+  :Mark leaf dirty;
+else (no)
+  :Find predecessor from left subtree;
+  :Replace removed internal item with predecessor;
+  :Remove predecessor from its leaf;
+  :Mark affected nodes dirty;
+endif
+
+:Load ancestor path from breadcrumbs;
+while (ancestor child underpopulated?) is (yes)
+  if (left sibling can spare item?) then (yes)
+    :Rotate right;
+    :Mark sibling, parent, child dirty;
+  elseif (right sibling can spare item?) then (yes)
+    :Rotate left;
+    :Mark child, parent, sibling dirty;
+  else (no)
+    :Merge with sibling;
+    :Mark merged node and parent dirty;
+    :Queue removed page for deletion;
+  endif
+endwhile (no)
+
+if (root empty and has child?) then (yes)
+  :Set collection root to first child page;
+endif
+
+stop
+
+@enduml

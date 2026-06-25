@@ -1,0 +1,27 @@
+@startuml
+title Serialized node page layout
+
+skinparam rectangle {
+  RoundCorner 0
+}
+
+rectangle "Node page buffer" as page {
+  rectangle "Header\n1 byte: isLeaf\n2 bytes: item count" as header
+  rectangle "Left-growing directory\nFor each item:\n- child page id if internal\n- 2 byte item offset\nLast child page id for internal nodes" as directory
+  rectangle "Unused space" as gap
+  rectangle "Right-growing cells\nFor each item:\n- 1 byte key length\n- key bytes\n- 1 byte value length\n- value bytes" as cells
+}
+
+header -right- directory
+directory -right- gap
+gap -right- cells
+
+directory --> cells : offsets point to cells
+
+note bottom
+serialize writes metadata from the left side of the page and variable-size key/value
+cells from the right side. deserialize follows offsets to rebuild Node.items and
+Node.childNodes.
+end note
+
+@enduml

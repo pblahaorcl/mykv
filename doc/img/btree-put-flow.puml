@@ -1,0 +1,44 @@
+@startuml
+title Collection.Put B+ tree flow
+
+start
+:Require write transaction;
+if (collection root == 0?) then (yes)
+  :Create leaf node with new item;
+  :Mark root node dirty;
+  :Set collection root page;
+  stop
+else (no)
+  :Load root node;
+endif
+
+:findKey(key, exact=false);
+while (current node is internal\nand key not found?) is (yes)
+  :Choose child index from item ordering;
+  :Load child node;
+endwhile (no)
+
+if (key already exists?) then (yes)
+  :Replace item at insertion index;
+else (no)
+  :Insert item into leaf at insertion index;
+endif
+:Mark modified leaf dirty;
+
+:Load ancestor path from breadcrumbs;
+while (ancestor child needs split?) is (yes)
+  :Parent.split(child, childIndex);
+  :Promote middle item to parent;
+  :Write parent, old child, and new child as dirty;
+endwhile (no)
+
+if (root overpopulated?) then (yes)
+  :Create new root with old root as first child;
+  :Split old root into new root;
+  :Mark new root dirty;
+  :Update collection root page;
+endif
+
+stop
+
+@enduml

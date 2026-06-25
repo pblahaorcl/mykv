@@ -1,0 +1,102 @@
+@startuml
+title mykv domain model
+
+skinparam classAttributeIconSize 0
+
+class DB {
+  -rwlock sync.RWMutex
+  +Open(path, options) *DB
+  +ReadTx() *tx
+  +WriteTx() *tx
+  +Close() error
+}
+
+class dal {
+  -pageSize int
+  -minFillPercent float32
+  -maxFillPercent float32
+  -file *os.File
+  +readPage(pageNum) *page
+  +writePage(page) error
+  +getNode(pageNum) *Node
+  +writeNode(node) *Node
+  +deleteNode(pageNum)
+}
+
+class meta {
+  -root pgnum
+  -freelistPage pgnum
+  +serialize(buf)
+  +deserialize(buf)
+}
+
+class freelist {
+  -maxPage pgnum
+  -releasedPages []pgnum
+  +getNextPage() pgnum
+  +releasePage(page)
+  +serialize(buf)
+  +deserialize(buf)
+}
+
+class tx {
+  -dirtyNodes map[pgnum]*Node
+  -pagesToDelete []pgnum
+  -allocatedPageNums []pgnum
+  -write bool
+  +Commit() error
+  +Rollback()
+  +GetCollection(name) *Collection
+  +CreateCollection(name) *Collection
+  +DeleteCollection(name) error
+}
+
+class Collection {
+  -name []byte
+  -root pgnum
+  -counter uint64
+  +ID() uint64
+  +Put(key, value) error
+  +Find(key) *Item
+  +Remove(key) error
+  +serialize() *Item
+  +deserialize(item)
+}
+
+class Node {
+  -pageNum pgnum
+  -items []*Item
+  -childNodes []pgnum
+  +findKey(key, exact)
+  +addItem(item, index)
+  +split(nodeToSplit, index)
+  +rebalanceRemove(node, index)
+  +serialize(buf) []byte
+  +deserialize(buf)
+}
+
+class Item {
+  -key []byte
+  -value []byte
+}
+
+class page {
+  -num pgnum
+  -data []byte
+}
+
+DB *-- dal
+dal *-- meta
+dal *-- freelist
+dal ..> page
+dal ..> Node : load/store
+tx --> DB
+tx o-- Node : dirty cache
+tx ..> Collection
+Collection --> tx
+Collection --> Node : root page
+Node --> tx
+Node *-- Item
+Node --> Node : child page refs
+
+@enduml

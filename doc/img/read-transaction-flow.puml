@@ -1,0 +1,47 @@
+@startuml
+title Read transaction and lookup flow
+
+actor Caller
+participant DB
+participant tx
+participant Collection
+participant Node
+participant dal
+database "data.db" as File
+
+Caller -> DB : ReadTx()
+DB -> DB : rwlock.RLock()
+DB -> tx : newTx(db, false)
+DB --> Caller : tx
+
+Caller -> tx : GetCollection(name)
+tx -> Collection : getRootCollection()
+Collection -> Node : Find(name)
+Node -> tx : getNode(root collection page)
+tx -> dal : getNode(pageNum)
+dal -> File : readPage(pageNum)
+dal -> Node : deserialize(page.data)
+Node -> Node : findKey(name, true)
+Node --> Collection : collection Item
+Collection -> Collection : deserialize(item)
+Collection --> Caller : Collection
+
+Caller -> Collection : Find(key)
+Collection -> tx : getNode(collection.root)
+tx -> dal : getNode(root page)
+dal -> File : readPage(pageNum)
+dal -> Node : deserialize(page.data)
+Node -> Node : findKey(key, true)
+loop while internal node and key not found
+  Node -> tx : getNode(childNodes[index])
+  tx -> dal : getNode(child page)
+  dal -> File : readPage(child page)
+  dal -> Node : deserialize(page.data)
+end
+Node --> Collection : Item or nil
+Collection --> Caller : Item or nil
+
+Caller -> tx : Commit() or Rollback()
+tx -> DB : rwlock.RUnlock()
+
+@enduml

@@ -1,0 +1,53 @@
+@startuml
+title Write transaction and commit flow
+
+actor Caller
+participant DB
+participant tx
+participant Collection
+participant Node
+participant dal
+participant freelist
+database "data.db" as File
+
+Caller -> DB : WriteTx()
+DB -> DB : rwlock.Lock()
+DB -> tx : newTx(db, true)
+DB --> Caller : tx
+
+Caller -> tx : GetCollection(name)\nor CreateCollection(name)
+tx -> Collection : getRootCollection()
+Collection -> Node : Find(name)
+Node -> tx : getNode(root page)
+tx -> dal : getNode(pageNum)
+dal -> File : readPage(pageNum)
+File --> dal : page bytes
+dal -> Node : deserialize(page.data)
+Node --> Collection : item or nil
+Collection --> tx : collection
+
+Caller -> Collection : Put(key, value)\nor Remove(key)
+Collection -> Node : findKey(...)
+Node -> tx : getNode(child pages)
+Collection -> Node : add/remove/rebalance
+Node -> tx : writeNode(node)
+tx -> tx : dirtyNodes[pageNum] = node
+
+Caller -> tx : Commit()
+loop dirtyNodes
+  tx -> dal : writeNode(node)
+  dal -> Node : serialize(page.data)
+  dal -> File : writePage(page)
+end
+loop pagesToDelete
+  tx -> dal : deleteNode(pageNum)
+  dal -> freelist : releasePage(pageNum)
+end
+tx -> dal : writeFreelist()
+dal -> freelist : serialize(page.data)
+dal -> File : writePage(freelist page)
+tx -> tx : clear transaction state
+tx -> DB : rwlock.Unlock()
+tx --> Caller : nil or error
+
+@enduml

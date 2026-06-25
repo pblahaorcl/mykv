@@ -1,0 +1,90 @@
+@startuml
+title mykv component architecture
+
+skinparam componentStyle rectangle
+skinparam packageStyle rectangle
+
+actor "CLI / caller" as Caller
+
+component "DB\n(db.go)" as DB {
+  [Open]
+  [ReadTx]
+  [WriteTx]
+  [Close]
+}
+
+component "Transaction\n(tx.go)" as Tx {
+  [dirtyNodes]
+  [pagesToDelete]
+  [allocatedPageNums]
+}
+
+component "Collection\n(collection.go)" as Collection {
+  [Put]
+  [Find]
+  [Remove]
+  [ID]
+}
+
+component "B+ tree Node\n(node.go)" as Node {
+  [findKey]
+  [split]
+  [rebalanceRemove]
+  [serialize]
+  [deserialize]
+}
+
+component "Data Access Layer\n(dal.go)" as DAL {
+  [readPage]
+  [writePage]
+  [getNode]
+  [writeNode]
+  [readMeta]
+  [writeMeta]
+  [readFreelist]
+  [writeFreelist]
+}
+
+component "Metadata\n(meta.go)" as Meta {
+  [root]
+  [freelistPage]
+}
+
+component "Freelist\n(freelist.go)" as Freelist {
+  [maxPage]
+  [releasedPages]
+  [getNextPage]
+  [releasePage]
+}
+
+database "data.db\nfixed-size pages" as File
+
+Caller --> DB : Open(path, options)
+Caller --> DB : ReadTx() / WriteTx()
+DB *-- DAL
+DAL *-- Meta
+DAL *-- Freelist
+DB --> Tx : newTx(db, write)
+Tx --> Collection : Get/Create/DeleteCollection
+Collection --> Node : tree operations
+Node --> Tx : getNode/writeNode/deleteNode
+Tx --> DAL : read cached or persisted nodes
+DAL --> File : ReadAt / WriteAt
+DAL --> Freelist : allocate/release page ids
+DAL --> Meta : root collection page
+
+note right of Tx
+Writes are buffered in dirtyNodes.
+Commit flushes dirty nodes, releases deleted
+pages, and persists the freelist.
+Rollback drops buffered changes and returns
+newly allocated pages to the freelist.
+end note
+
+note bottom of Collection
+The database root is itself a collection.
+It maps collection names to serialized
+collection metadata: root page and counter.
+end note
+
+@enduml
