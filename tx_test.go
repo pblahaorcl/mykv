@@ -1,8 +1,8 @@
 package mykv
 
 import (
-	"sync"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -79,56 +79,48 @@ func TestTx_OpenMultipleReadTxSimultaneously(t *testing.T) {
 	require.NoError(t, err)
 }
 
-// TestTx_OpenReadAndWriteTxSimultaneously Validates read and write tx don't run simultaneously. It first starts a read
-// tx, then once the lock was acquired, a write transaction is started. Once the read tx finishes, the lock is released,
-// and the write tx start executing. Once the lock is acquired again, a read tx is triggered.
-// The nesting of the functions is done to make sure the transactions are fired only after the lock is acquired to avoid
-// race conditions.
-// We expect the first read tx (tx1) not to see the changes done by the write tx (tx2) even when though it queries the database
-// after the write tx was triggered (Because of the lock).
-// And again, even though tx3 was triggered before tx2 committed the changes, it doesn't query the database yet since
-// the lock is already acquired. It will query the database only after tx2 makes the changes and releases the lock.
+// TestTx_OpenReadAndWriteTxSimultaneously validates that read transactions can run while a writer is open, but they
+// only observe committed data. The writer's commit waits for open readers before applying pages to disk.
 func TestTx_OpenReadAndWriteTxSimultaneously(t *testing.T) {
 	db, cleanFunc := createTestDB(t)
 	defer cleanFunc()
 
-	wg := sync.WaitGroup{}
-
 	tx1 := db.ReadTx()
 
-	// Start write tx only after the lock was acquired by the read tx
-	wg.Add(1)
-	go func() {
-		tx2 := db.WriteTx()
+	tx2 := db.WriteTx()
+	_, err := tx2.CreateCollection(testCollectionName)
+	require.NoError(t, err)
 
-		// Start read tx only after the lock was acquired by the write tx
-		wg.Add(1)
-		go func() {
-			tx3 := db.ReadTx()
-
-			collection3, err := tx3.GetCollection(testCollectionName)
-			require.NoError(t, err)
-			require.Equal(t, testCollectionName, collection3.name)
-
-			err = tx3.Commit()
-			require.NoError(t, err)
-			wg.Done()
-		}()
-
-		_, err := tx2.CreateCollection(testCollectionName)
-		require.NoError(t, err)
-
-		err = tx2.Commit()
-		require.NoError(t, err)
-		wg.Done()
-	}()
+	tx3 := db.ReadTx()
+	collection3, err := tx3.GetCollection(testCollectionName)
+	require.NoError(t, err)
+	require.Nil(t, collection3)
+	require.NoError(t, tx3.Commit())
 
 	collection1, err := tx1.GetCollection(testCollectionName)
 	require.NoError(t, err)
 	require.Nil(t, collection1)
-	err = tx1.Commit()
+
+	commitDone := make(chan error, 1)
+	go func() {
+		commitDone <- tx2.Commit()
+	}()
+
+	select {
+	case err := <-commitDone:
+		require.NoError(t, err)
+		t.Fatal("write commit completed while a read transaction was open")
+	case <-time.After(50 * time.Millisecond):
+	}
+
+	require.NoError(t, tx1.Commit())
+	require.NoError(t, <-commitDone)
+
+	tx4 := db.ReadTx()
+	collection4, err := tx4.GetCollection(testCollectionName)
 	require.NoError(t, err)
-	wg.Wait()
+	require.NotNil(t, collection4)
+	require.NoError(t, tx4.Commit())
 }
 
 func TestTx_Rollback(t *testing.T) {
@@ -162,9 +154,9 @@ func TestTx_Rollback(t *testing.T) {
 
 	tx2.Rollback()
 
-	// 9 should not exist since a rollback was performed. A new page should be added to released page ids though, since
-	// a split occurred and a new page node was created, but later deleted.
-	assert.Len(t, tx2.db.freelist.releasedPages, 1)
+	// 9 should not exist since a rollback was performed. Transaction-local page allocation means rollback does not
+	// mutate the committed freelist.
+	assert.Len(t, tx2.db.freelist.releasedPages, 0)
 	tx3 := db.ReadTx()
 
 	collection, err = tx3.GetCollection(collection.name)
@@ -179,5 +171,5 @@ func TestTx_Rollback(t *testing.T) {
 	err = tx3.Commit()
 	require.NoError(t, err)
 
-	assert.Len(t, tx3.db.freelist.releasedPages, 1)
+	assert.Len(t, tx3.db.freelist.releasedPages, 0)
 }

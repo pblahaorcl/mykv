@@ -27,6 +27,8 @@ type page struct {
 }
 
 type dal struct {
+	path           string
+	walPath        string
 	pageSize       int
 	minFillPercent float32
 	maxFillPercent float32
@@ -51,6 +53,8 @@ type dal struct {
 func newDal(path string, options *Options) (*dal, error) {
 	dal := &dal{
 		meta:           newEmptyMeta(),
+		path:           path,
+		walPath:        path + ".wal",
 		pageSize:       options.pageSize,
 		minFillPercent: options.MinFillPercent,
 		maxFillPercent: options.MaxFillPercent,
@@ -59,6 +63,10 @@ func newDal(path string, options *Options) (*dal, error) {
 	if _, err := os.Stat(path); err == nil { // exists the read from file
 		dal.file, err = os.OpenFile(path, os.O_RDWR|os.O_CREATE, 0666)
 		if err != nil {
+			_ = dal.close()
+			return nil, err
+		}
+		if err := dal.recoverWAL(); err != nil {
 			_ = dal.close()
 			return nil, err
 		}
@@ -98,6 +106,9 @@ func newDal(path string, options *Options) (*dal, error) {
 
 		// write meta page
 		if _, err = dal.writeMeta(dal.meta); err != nil {
+			return nil, err
+		}
+		if err = dal.file.Sync(); err != nil {
 			return nil, err
 		}
 	} else {
@@ -180,6 +191,15 @@ func (d *dal) writePage(p *page) error {
 	return err
 }
 
+func (d *dal) writePages(pages []*page) error {
+	for _, p := range pages {
+		if err := d.writePage(p); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // getNode retrieves a node from a page.
 func (d *dal) getNode(pageNum pgnum) (*Node, error) {
 	p, err := d.readPage(pageNum)
@@ -197,22 +217,29 @@ func (d *dal) getNode(pageNum pgnum) (*Node, error) {
 
 // writeNode writes a node to a page.
 func (d *dal) writeNode(n *Node) (*Node, error) {
-	if err := n.validate(d.pageSize); err != nil {
+	p, err := d.nodePage(n)
+	if err != nil {
 		return nil, err
 	}
-	p := d.allocateEmptyPage()
 	if n.pageNum == 0 {
 		p.num = d.getNextPage()
 		n.pageNum = p.num
-	} else {
-		p.num = n.pageNum
 	}
-	p.data = n.serialize(p.data)
-	err := d.writePage(p)
+	err = d.writePage(p)
 	if err != nil {
 		return nil, err
 	}
 	return n, nil
+}
+
+func (d *dal) nodePage(n *Node) (*page, error) {
+	if err := n.validate(d.pageSize); err != nil {
+		return nil, err
+	}
+	p := d.allocateEmptyPage()
+	p.num = n.pageNum
+	p.data = n.serialize(p.data)
+	return p, nil
 }
 
 // deleteNode deletes a node by releasing its page.

@@ -7,8 +7,9 @@ import (
 )
 
 type DB struct {
-	rwlock sync.RWMutex // Allows only one writer at a time
-	*dal                // Data Access Layear
+	writeLock  sync.Mutex   // Allows only one writer at a time.
+	commitLock sync.RWMutex // Keeps readers away from the short disk-apply phase.
+	*dal                    // Data Access Layer
 }
 
 // Open opens a database at the given path with the provided options.
@@ -25,8 +26,7 @@ func Open(path string, options *Options) (*DB, error) {
 		return nil, err
 	}
 	db := &DB{
-		sync.RWMutex{},
-		dal,
+		dal: dal,
 	}
 	return db, nil
 }
@@ -71,12 +71,12 @@ func (db *DB) Close() error {
 
 // ReadTx starts a read-only transaction.
 func (db *DB) ReadTx() *Tx {
-	db.rwlock.RLock()
+	db.commitLock.RLock()
 	return newTx(db, false)
 }
 
 // WriteTx starts a read-write transaction.
 func (db *DB) WriteTx() *Tx {
-	db.rwlock.Lock()
+	db.writeLock.Lock()
 	return newTx(db, true)
 }

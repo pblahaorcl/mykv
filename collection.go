@@ -11,7 +11,9 @@ type Collection struct {
 	counter uint64
 
 	// associated transaction
-	tx *Tx
+	tx             *Tx
+	rootCollection bool
+	dirtyMeta      bool
 }
 
 // newCollection creates a new collection.
@@ -35,6 +37,7 @@ func (c *Collection) ID() uint64 {
 
 	id := c.counter
 	c.counter += 1
+	c.markMetadataDirty()
 	return id
 }
 
@@ -57,7 +60,7 @@ func (c *Collection) Put(key []byte, value []byte) error {
 	var err error
 	if c.root == 0 {
 		root = c.tx.writeNode(c.tx.newNode([]*Item{i}, []pgnum{}))
-		c.root = root.pageNum
+		c.setRoot(root.pageNum)
 		return nil
 	} else {
 		root, err = c.tx.getNode(c.root)
@@ -105,7 +108,7 @@ func (c *Collection) Put(key []byte, value []byte) error {
 		// commit newly created root
 		newRoot = c.tx.writeNode(newRoot)
 
-		c.root = newRoot.pageNum
+		c.setRoot(newRoot.pageNum)
 	}
 
 	return nil
@@ -183,10 +186,30 @@ func (c *Collection) Remove(key []byte) error {
 	rootNode = ancestors[0]
 	// If the root has no items after rebalancing, there's no need to save it because we ignore it.
 	if len(rootNode.items) == 0 && len(rootNode.childNodes) > 0 {
-		c.root = ancestors[1].pageNum
+		c.setRoot(ancestors[1].pageNum)
 	}
 
 	return nil
+}
+
+func (c *Collection) setRoot(root pgnum) {
+	if c.root == root {
+		return
+	}
+	c.root = root
+	if c.rootCollection {
+		c.tx.root = root
+		return
+	}
+	c.markMetadataDirty()
+}
+
+func (c *Collection) markMetadataDirty() {
+	if c.rootCollection || c.tx == nil || !c.tx.write {
+		return
+	}
+	c.dirtyMeta = true
+	c.tx.trackCollection(c)
 }
 
 // getNodes returns a list of nodes based on their indexes (the breadcrumbs) from the root

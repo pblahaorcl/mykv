@@ -1,0 +1,233 @@
+{
+  "version": 1,
+  "timestamp": "2026-06-26T11:20:21Z",
+  "command": [
+    "go",
+    "test",
+    "-run=^$",
+    "-bench=.",
+    "-benchmem",
+    "-count=3",
+    "./..."
+  ],
+  "go_version": "go version go1.23.4 darwin/amd64",
+  "git_commit": "78c3f38b7fd81b6aa95a3a3e67db08826b521749",
+  "git_dirty": true,
+  "system": {
+    "id": "darwin-amd64-intel-r-core-tm-i7-1068ng7-cpu-2-30ghz",
+    "goos": "darwin",
+    "goarch": "amd64",
+    "cpu": "Intel(R) Core(TM) i7-1068NG7 CPU @ 2.30GHz"
+  },
+  "raw_output": "runs/darwin-amd64-intel-r-core-tm-i7-1068ng7-cpu-2-30ghz/20260626T112021Z.txt",
+  "results": [
+    {
+      "name": "BenchmarkCollectionFindExisting/items=100",
+      "samples": [
+        {
+          "iterations": 352971,
+          "ns_per_op": 3896,
+          "bytes_per_op": 39,
+          "allocs_per_op": 2
+        },
+        {
+          "iterations": 1000000,
+          "ns_per_op": 2326,
+          "bytes_per_op": 39,
+          "allocs_per_op": 2
+        },
+        {
+          "iterations": 1000000,
+          "ns_per_op": 1272,
+          "bytes_per_op": 39,
+          "allocs_per_op": 2
+        }
+      ],
+      "median_ns_per_op": 2326,
+      "median_bytes_per_op": 39,
+      "median_allocs_per_op": 2
+    },
+    {
+      "name": "BenchmarkCollectionFindExisting/items=1000",
+      "samples": [
+        {
+          "iterations": 929091,
+          "ns_per_op": 1080,
+          "bytes_per_op": 76,
+          "allocs_per_op": 4
+        },
+        {
+          "iterations": 1338315,
+          "ns_per_op": 811.7,
+          "bytes_per_op": 76,
+          "allocs_per_op": 4
+        },
+        {
+          "iterations": 1766787,
+          "ns_per_op": 590.9,
+          "bytes_per_op": 76,
+          "allocs_per_op": 4
+        }
+      ],
+      "median_ns_per_op": 811.7,
+      "median_bytes_per_op": 76,
+      "median_allocs_per_op": 4
+    },
+    {
+      "name": "BenchmarkCollectionFindExisting/items=10000",
+      "samples": [
+        {
+          "iterations": 2083564,
+          "ns_per_op": 607.4,
+          "bytes_per_op": 78,
+          "allocs_per_op": 4
+        },
+        {
+          "iterations": 2137380,
+          "ns_per_op": 657.5,
+          "bytes_per_op": 78,
+          "allocs_per_op": 4
+        },
+        {
+          "iterations": 1807926,
+          "ns_per_op": 582.9,
+          "bytes_per_op": 78,
+          "allocs_per_op": 4
+        }
+      ],
+      "median_ns_per_op": 607.4,
+      "median_bytes_per_op": 78,
+      "median_allocs_per_op": 4
+    },
+    {
+      "name": "BenchmarkCollectionFindMissing/items=100",
+      "samples": [
+        {
+          "iterations": 3377966,
+          "ns_per_op": 335.8,
+          "bytes_per_op": 40,
+          "allocs_per_op": 3
+        },
+        {
+          "iterations": 3672109,
+          "ns_per_op": 322,
+          "bytes_per_op": 40,
+          "allocs_per_op": 3
+        },
+        {
+          "iterations": 3958423,
+          "ns_per_op": 316.3,
+          "bytes_per_op": 40,
+          "allocs_per_op": 3
+        }
+      ],
+      "median_ns_per_op": 322,
+      "median_bytes_per_op": 40,
+      "median_allocs_per_op": 3
+    },
+    {
+      "name": "BenchmarkCollectionFindMissing/items=1000",
+      "samples": [
+        {
+          "iterations": 2963286,
+          "ns_per_op": 429.7,
+          "bytes_per_op": 80,
+          "allocs_per_op": 5
+        },
+        {
+          "iterations": 2852200,
+          "ns_per_op": 425.1,
+          "bytes_per_op": 80,
+          "allocs_per_op": 5
+        },
+        {
+          "iterations": 2564479,
+          "ns_per_op": 481.4,
+          "bytes_per_op": 80,
+          "allocs_per_op": 5
+        }
+      ],
+      "median_ns_per_op": 429.7,
+      "median_bytes_per_op": 80,
+      "median_allocs_per_op": 5
+    },
+    {
+      "name": "BenchmarkCollectionFindMissing/items=10000",
+      "samples": [
+        {
+          "iterations": 2450782,
+          "ns_per_op": 517.1,
+          "bytes_per_op": 80,
+          "allocs_per_op": 5
+        },
+        {
+          "iterations": 2219157,
+          "ns_per_op": 522.9,
+          "bytes_per_op": 80,
+          "allocs_per_op": 5
+        },
+        {
+          "iterations": 2137968,
+          "ns_per_op": 527.3,
+          "bytes_per_op": 80,
+          "allocs_per_op": 5
+        }
+      ],
+      "median_ns_per_op": 522.9,
+      "median_bytes_per_op": 80,
+      "median_allocs_per_op": 5
+    },
+    {
+      "name": "BenchmarkCollectionPut",
+      "samples": [
+        {
+          "iterations": 1000000,
+          "ns_per_op": 1476,
+          "bytes_per_op": 365,
+          "allocs_per_op": 14
+        },
+        {
+          "iterations": 1000000,
+          "ns_per_op": 1595,
+          "bytes_per_op": 365,
+          "allocs_per_op": 14
+        },
+        {
+          "iterations": 719274,
+          "ns_per_op": 8103,
+          "bytes_per_op": 346,
+          "allocs_per_op": 14
+        }
+      ],
+      "median_ns_per_op": 1595,
+      "median_bytes_per_op": 365,
+      "median_allocs_per_op": 14
+    },
+    {
+      "name": "BenchmarkCollectionRemove",
+      "samples": [
+        {
+          "iterations": 1000000,
+          "ns_per_op": 1674,
+          "bytes_per_op": 232,
+          "allocs_per_op": 9
+        },
+        {
+          "iterations": 1000000,
+          "ns_per_op": 1696,
+          "bytes_per_op": 232,
+          "allocs_per_op": 9
+        },
+        {
+          "iterations": 1000000,
+          "ns_per_op": 1520,
+          "bytes_per_op": 232,
+          "allocs_per_op": 9
+        }
+      ],
+      "median_ns_per_op": 1674,
+      "median_bytes_per_op": 232,
+      "median_allocs_per_op": 9
+    }
+  ]
+}

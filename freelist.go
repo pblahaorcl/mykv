@@ -23,6 +23,15 @@ func newFreelist() *freelist {
 	}
 }
 
+func (fr *freelist) clone() *freelist {
+	releasedPages := make([]pgnum, len(fr.releasedPages))
+	copy(releasedPages, fr.releasedPages)
+	return &freelist{
+		maxPage:       fr.maxPage,
+		releasedPages: releasedPages,
+	}
+}
+
 // getNextPage returns page ids for writing New page ids are first given from the releasedPageIDs to avoid growing
 // the file. If it's empty, then maxPage is incremented and a new page is created thus increasing the file size.
 func (fr *freelist) getNextPage() pgnum {
