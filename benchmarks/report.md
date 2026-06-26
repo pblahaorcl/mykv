@@ -6,51 +6,51 @@ Comparisons are only made between runs with identical `goos`, `goarch`, and `cpu
 
 ## Current Run
 
-- Timestamp: `2026-06-26T10:46:11Z`
+- Timestamp: `2026-06-26T11:20:21Z`
 - System: `darwin/amd64`, CPU `Intel(R) Core(TM) i7-1068NG7 CPU @ 2.30GHz`
 - Go: `go version go1.23.4 darwin/amd64`
-- Git commit: `157b9d80713e807729aa2e93c52a88e1c28501d8`
+- Git commit: `78c3f38b7fd81b6aa95a3a3e67db08826b521749`
 - Git tree: `dirty`
 - Command: `go test -run=^$ -bench=. -benchmem -count=3 ./...`
-- Raw output: [runs/darwin-amd64-intel-r-core-tm-i7-1068ng7-cpu-2-30ghz/20260626T104611Z.txt](runs/darwin-amd64-intel-r-core-tm-i7-1068ng7-cpu-2-30ghz/20260626T104611Z.txt)
-- Parsed data: [runs/darwin-amd64-intel-r-core-tm-i7-1068ng7-cpu-2-30ghz/20260626T104611Z.json](runs/darwin-amd64-intel-r-core-tm-i7-1068ng7-cpu-2-30ghz/20260626T104611Z.json)
+- Raw output: [runs/darwin-amd64-intel-r-core-tm-i7-1068ng7-cpu-2-30ghz/20260626T112021Z.txt](runs/darwin-amd64-intel-r-core-tm-i7-1068ng7-cpu-2-30ghz/20260626T112021Z.txt)
+- Parsed data: [runs/darwin-amd64-intel-r-core-tm-i7-1068ng7-cpu-2-30ghz/20260626T112021Z.json](runs/darwin-amd64-intel-r-core-tm-i7-1068ng7-cpu-2-30ghz/20260626T112021Z.json)
 
 ## Current vs Previous Same Hardware
 
-Previous run: [runs/darwin-amd64-intel-r-core-tm-i7-1068ng7-cpu-2-30ghz/20260626T104148Z.json](runs/darwin-amd64-intel-r-core-tm-i7-1068ng7-cpu-2-30ghz/20260626T104148Z.json) from `2026-06-26T10:41:48Z`.
+Previous run: [runs/darwin-amd64-intel-r-core-tm-i7-1068ng7-cpu-2-30ghz/20260626T104611Z.json](runs/darwin-amd64-intel-r-core-tm-i7-1068ng7-cpu-2-30ghz/20260626T104611Z.json) from `2026-06-26T10:46:11Z`.
 
 | Benchmark | Previous ns/op | Current ns/op | ns/op change | Current B/op | Current allocs/op |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| `BenchmarkCollectionFindExisting/items=100` | 773.6 | 292.2 | -62.23% | 39 | 2 |
-| `BenchmarkCollectionFindExisting/items=1000` | 900.9 | 385.1 | -57.25% | 76 | 4 |
-| `BenchmarkCollectionFindExisting/items=10000` | 878.7 | 408.4 | -53.52% | 78 | 4 |
-| `BenchmarkCollectionFindMissing/items=100` | 528.9 | 258.8 | -51.07% | 40 | 3 |
-| `BenchmarkCollectionFindMissing/items=1000` | 762.7 | 358.7 | -52.97% | 80 | 5 |
-| `BenchmarkCollectionFindMissing/items=10000` | 681.2 | 430.7 | -36.77% | 80 | 5 |
-| `BenchmarkCollectionPut` | 4124 | 1316 | -68.09% | 368 | 14 |
-| `BenchmarkCollectionRemove` | 1326 | 1932 | +45.70% | 231 | 9 |
+| `BenchmarkCollectionFindExisting/items=100` | 292.2 | 2326 | +696.03% | 39 | 2 |
+| `BenchmarkCollectionFindExisting/items=1000` | 385.1 | 811.7 | +110.78% | 76 | 4 |
+| `BenchmarkCollectionFindExisting/items=10000` | 408.4 | 607.4 | +48.73% | 78 | 4 |
+| `BenchmarkCollectionFindMissing/items=100` | 258.8 | 322 | +24.42% | 40 | 3 |
+| `BenchmarkCollectionFindMissing/items=1000` | 358.7 | 429.7 | +19.79% | 80 | 5 |
+| `BenchmarkCollectionFindMissing/items=10000` | 430.7 | 522.9 | +21.41% | 80 | 5 |
+| `BenchmarkCollectionPut` | 1316 | 1595 | +21.20% | 365 | 14 |
+| `BenchmarkCollectionRemove` | 1932 | 1674 | -13.35% | 232 | 9 |
 
 ## Latest Results By System
 
 ### darwin-amd64-intel-r-core-tm-i7-1068ng7-cpu-2-30ghz
 
-- Timestamp: `2026-06-26T10:46:11Z`
+- Timestamp: `2026-06-26T11:20:21Z`
 - System: `darwin/amd64`, CPU `Intel(R) Core(TM) i7-1068NG7 CPU @ 2.30GHz`
 - Go: `go version go1.23.4 darwin/amd64`
-- Git commit: `157b9d80713e807729aa2e93c52a88e1c28501d8`
+- Git commit: `78c3f38b7fd81b6aa95a3a3e67db08826b521749`
 - Git tree: `dirty`
 - Command: `go test -run=^$ -bench=. -benchmem -count=3 ./...`
-- Raw output: [runs/darwin-amd64-intel-r-core-tm-i7-1068ng7-cpu-2-30ghz/20260626T104611Z.txt](runs/darwin-amd64-intel-r-core-tm-i7-1068ng7-cpu-2-30ghz/20260626T104611Z.txt)
-- Parsed data: [runs/darwin-amd64-intel-r-core-tm-i7-1068ng7-cpu-2-30ghz/20260626T104611Z.json](runs/darwin-amd64-intel-r-core-tm-i7-1068ng7-cpu-2-30ghz/20260626T104611Z.json)
+- Raw output: [runs/darwin-amd64-intel-r-core-tm-i7-1068ng7-cpu-2-30ghz/20260626T112021Z.txt](runs/darwin-amd64-intel-r-core-tm-i7-1068ng7-cpu-2-30ghz/20260626T112021Z.txt)
+- Parsed data: [runs/darwin-amd64-intel-r-core-tm-i7-1068ng7-cpu-2-30ghz/20260626T112021Z.json](runs/darwin-amd64-intel-r-core-tm-i7-1068ng7-cpu-2-30ghz/20260626T112021Z.json)
 
 | Benchmark | Median ns/op | Median B/op | Median allocs/op |
 | --- | ---: | ---: | ---: |
-| `BenchmarkCollectionFindExisting/items=100` | 292.2 | 39 | 2 |
-| `BenchmarkCollectionFindExisting/items=1000` | 385.1 | 76 | 4 |
-| `BenchmarkCollectionFindExisting/items=10000` | 408.4 | 78 | 4 |
-| `BenchmarkCollectionFindMissing/items=100` | 258.8 | 40 | 3 |
-| `BenchmarkCollectionFindMissing/items=1000` | 358.7 | 80 | 5 |
-| `BenchmarkCollectionFindMissing/items=10000` | 430.7 | 80 | 5 |
-| `BenchmarkCollectionPut` | 1316 | 368 | 14 |
-| `BenchmarkCollectionRemove` | 1932 | 231 | 9 |
+| `BenchmarkCollectionFindExisting/items=100` | 2326 | 39 | 2 |
+| `BenchmarkCollectionFindExisting/items=1000` | 811.7 | 76 | 4 |
+| `BenchmarkCollectionFindExisting/items=10000` | 607.4 | 78 | 4 |
+| `BenchmarkCollectionFindMissing/items=100` | 322 | 40 | 3 |
+| `BenchmarkCollectionFindMissing/items=1000` | 429.7 | 80 | 5 |
+| `BenchmarkCollectionFindMissing/items=10000` | 522.9 | 80 | 5 |
+| `BenchmarkCollectionPut` | 1595 | 365 | 14 |
+| `BenchmarkCollectionRemove` | 1674 | 232 | 9 |
 
