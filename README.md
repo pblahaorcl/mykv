@@ -1,7 +1,7 @@
 # Key-Value Store implementation
 
 ## Description
-This document provides an overview of the design and architecture of the Key-Value Store project. The project is structured into several key components, each responsible for different aspects of the key-value store's functionality. The DAL manages low-level storage operations, the B+ tree provides efficient data structure operations, transactions ensure atomicity and isolation, and collections group related key-value pairs together.
+Key-Value Store implementation. The project is structured into several key components, each responsible for different aspects of the key-value store's functionality. The DAL manages low-level storage operations, the B+ tree provides efficient data structure operations, transactions ensure atomicity and isolation, and collections group related key-value pairs together.
 
 
 ## Design Architecture
