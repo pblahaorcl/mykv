@@ -1,0 +1,33 @@
+goos: darwin
+goarch: amd64
+pkg: mykv
+cpu: Intel(R) Core(TM) i7-1068NG7 CPU @ 2.30GHz
+BenchmarkCollectionPut-8            	 1000000	      1394 ns/op	     368 B/op	      14 allocs/op
+BenchmarkCollectionPut-8            	 1000000	      1306 ns/op	     368 B/op	      14 allocs/op
+BenchmarkCollectionPut-8            	 1000000	      1316 ns/op	     368 B/op	      14 allocs/op
+BenchmarkCollectionFindExisting/items=100-8         	 3905700	       298.1 ns/op	      39 B/op	       2 allocs/op
+BenchmarkCollectionFindExisting/items=100-8         	 4062046	       292.2 ns/op	      39 B/op	       2 allocs/op
+BenchmarkCollectionFindExisting/items=100-8         	 4145277	       289.9 ns/op	      39 B/op	       2 allocs/op
+BenchmarkCollectionFindExisting/items=1000-8        	 3138031	       391.4 ns/op	      76 B/op	       4 allocs/op
+BenchmarkCollectionFindExisting/items=1000-8        	 3189950	       384.3 ns/op	      76 B/op	       4 allocs/op
+BenchmarkCollectionFindExisting/items=1000-8        	 3149565	       385.1 ns/op	      76 B/op	       4 allocs/op
+BenchmarkCollectionFindExisting/items=10000-8       	 2949573	       432.0 ns/op	      78 B/op	       4 allocs/op
+BenchmarkCollectionFindExisting/items=10000-8       	 2913410	       408.4 ns/op	      78 B/op	       4 allocs/op
+BenchmarkCollectionFindExisting/items=10000-8       	 2967517	       408.0 ns/op	      78 B/op	       4 allocs/op
+BenchmarkCollectionFindMissing/items=100-8          	 4678676	       259.8 ns/op	      40 B/op	       3 allocs/op
+BenchmarkCollectionFindMissing/items=100-8          	 4291941	       258.8 ns/op	      40 B/op	       3 allocs/op
+BenchmarkCollectionFindMissing/items=100-8          	 4605888	       258.8 ns/op	      40 B/op	       3 allocs/op
+BenchmarkCollectionFindMissing/items=1000-8         	 3037778	       358.7 ns/op	      80 B/op	       5 allocs/op
+BenchmarkCollectionFindMissing/items=1000-8         	 3518553	       364.5 ns/op	      80 B/op	       5 allocs/op
+BenchmarkCollectionFindMissing/items=1000-8         	 3515085	       346.1 ns/op	      80 B/op	       5 allocs/op
+BenchmarkCollectionFindMissing/items=10000-8        	 3247423	       370.7 ns/op	      80 B/op	       5 allocs/op
+BenchmarkCollectionFindMissing/items=10000-8        	 2968057	       496.3 ns/op	      80 B/op	       5 allocs/op
+BenchmarkCollectionFindMissing/items=10000-8        	 2863248	       430.7 ns/op	      80 B/op	       5 allocs/op
+BenchmarkCollectionRemove-8                         	 1000000	      1510 ns/op	     232 B/op	       9 allocs/op
+BenchmarkCollectionRemove-8                         	  988791	      1932 ns/op	     231 B/op	       9 allocs/op
+BenchmarkCollectionRemove-8                         	  728756	      2586 ns/op	     218 B/op	       9 allocs/op
+PASS
+ok  	mykv	49.164s
+?   	mykv/cmd/mykv	[no test files]
+PASS
+ok  	mykv/tools/benchreport	1.251s
