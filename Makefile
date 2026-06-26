@@ -1,6 +1,9 @@
 # Build k/v database
 all: test build
 
+BENCH ?= .
+BENCH_COUNT ?= 3
+
 build:
 	go build -o mykv ./cmd/mykv
 
@@ -20,7 +23,7 @@ race:
 	go test -race ./...
 
 bench:
-	go test -bench=. -benchmem ./...
+	go run ./tools/benchreport -bench="$(BENCH)" -count="$(BENCH_COUNT)"
 
 clean:
 	rm -rf mykv data.db
